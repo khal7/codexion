@@ -2,19 +2,22 @@
 
 int main(int ac, char **av)
 {
-    t_args var;
+    t_args arg;
+    t_simulation sim;
+
+    
 
     if (ac != 9)
     {
         printf("The number of argument should be 8.\n");
         return 0;
     }
-    if (args_to_struct(ac, av, &var) == -1)
+    if (args_to_struct(ac, av, &arg) == -1)
     {
         printf("Invalid arguments.\n");
         return 0;
     }
-
+    allocation_initializtion(arg, sim);
 
     printf("this: %ld\n", var.number_of_coders);
     printf("this: %ld\n", var.time_to_burnout);
