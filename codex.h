@@ -19,10 +19,7 @@ typedef struct
     int compile_count;
     int    burned_out;
     t_simulation *sim;
-
-
-
-}t_coder;
+} t_coder;
 
 typedef struct
 {
@@ -59,3 +56,6 @@ typedef struct
 
 int	args_to_struct(int ac, char **av, t_args *ptr);
 long	ft_atoi(char *str);
+int coder_initializtion(t_args *arg, t_simulation *sim);
+int	dongle_initialization(t_args *arg, t_simulation *sim);
+int	cleanup_dongles(t_simulation *sim, int count);

@@ -51,34 +51,31 @@ int  args_to_struct(int ac, char **av, t_args *ptr)
 	return (0);
 }
 
-int coder_initializtion(t_args *arg, t_simulation *sim)
+int coder_init(t_args *arg, t_simulation *sim)
 {
-	sim->args = *arg;
 	int	i;
+	
+	sim->args = *arg;
 	sim->coders = NULL;
 	sim->coders = malloc(sizeof(t_coder) * arg->number_of_coders);
 	if (!sim->coders)
-	{
-		free(sim->coders);
-		return (1);
-	}
+		return (cleanup_dongles(sim, sim->args.number_of_coders), 1);
 	i = 0;
 	while (i < arg->number_of_coders)
 	{
 		sim->coders[i].id = i + 1;
 		//sim->coders[i].t = something;
-		//sim->coders[i].left_dongle = something;
-		//sim->coders[i].right_dongle = something;
 		sim->coders[i].last_compile_start = 0;
 		sim->coders[i].compile_count = 0;
 		sim->coders[i].burned_out = 0;
 		sim->coders[i].sim = sim;
 		i++;
 	}
+	connect_dongles(sim);
 	return (0);
 }
 
-int	dongle_initialization(t_args *arg, t_simulation *sim)
+int	dongle_init(t_args *arg, t_simulation *sim)
 {
 	int	i;
 
@@ -90,14 +87,11 @@ int	dongle_initialization(t_args *arg, t_simulation *sim)
 	while (i < arg->number_of_coders)
 	{
 		if (pthread_mutex_init(&sim->dongles[i].lock, NULL))
-		{
-			free(sim->dongles);
-			return (1);
-		}
+			return (cleanup_dongles(sim, i));
 		if (pthread_cond_init(&sim->dongles[i].cond, NULL))
 		{
-			free(sim->dongles);
-			return (1);
+			pthread_mutex_destroy(&sim->dongles[i].lock);
+			return (cleanup_dongles(sim, i));
 		}
 		sim->dongles[i].is_available = 1;
 		sim->dongles[i].waiting_count = 0;
@@ -107,33 +101,19 @@ int	dongle_initialization(t_args *arg, t_simulation *sim)
 	return (0);
 }
 
+int	cleanup_dongles(t_simulation *sim, int count)
+{
+	int	i;
 
-
-
-
-
-
-
-// int if_digit(int ac, char **av)
-// {
-//     int i;
-//     int j;
-
-//     i = 1;
-
-//     while (i < (ac - 1))
-//     {
-//         j = 0;
-//         if (!av[i][j])
-//             return (1);
-//         while (av[i][j])
-//         {
-//             if (!(av[i][j] >= '0' && av[i][j] <= '9'))
-//                 return (1);
-//             j++;
-//         }
-//         i++;
-//     }
-//     return (0);
-// }
+	i = 0;
+	while (i < count)
+	{
+		pthread_cond_destroy(&sim->dongles[i].cond);
+		pthread_mutex_destroy(&sim->dongles[i].lock);
+		i++;
+	}
+	free(sim->dongles);
+	sim->dongles = NULL;
+	return (1);
+}
 
