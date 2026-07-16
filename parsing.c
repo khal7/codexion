@@ -75,32 +75,6 @@ int coder_init(t_args *arg, t_simulation *sim)
 	return (0);
 }
 
-int	dongle_init(t_args *arg, t_simulation *sim)
-{
-	int	i;
-
-	sim->dongles = NULL;
-	sim->dongles = malloc(sizeof(t_dongle) * arg->number_of_coders);
-	if (!sim->dongles)
-		return (1);
-	i = 0;
-	while (i < arg->number_of_coders)
-	{
-		if (pthread_mutex_init(&sim->dongles[i].lock, NULL))
-			return (cleanup_dongles(sim, i));
-		if (pthread_cond_init(&sim->dongles[i].cond, NULL))
-		{
-			pthread_mutex_destroy(&sim->dongles[i].lock);
-			return (cleanup_dongles(sim, i));
-		}
-		sim->dongles[i].is_available = 1;
-		sim->dongles[i].waiting_count = 0;
-		sim->dongles[i].last_released_time = 0;
-		i++;
-	}
-	return (0);
-}
-
 int	cleanup_dongles(t_simulation *sim, int count)
 {
 	int	i;
@@ -116,4 +90,3 @@ int	cleanup_dongles(t_simulation *sim, int count)
 	sim->dongles = NULL;
 	return (1);
 }
-
