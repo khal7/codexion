@@ -56,6 +56,8 @@ int coder_init(t_args *arg, t_simulation *sim)
 	int	i;
 	
 	sim->args = *arg;
+	sim->start_time = 0;
+	sim->similation_finished = 0
 	sim->coders = NULL;
 	sim->coders = malloc(sizeof(t_coder) * arg->number_of_coders);
 	if (!sim->coders)
@@ -64,7 +66,6 @@ int coder_init(t_args *arg, t_simulation *sim)
 	while (i < arg->number_of_coders)
 	{
 		sim->coders[i].id = i + 1;
-		//sim->coders[i].t = something;
 		sim->coders[i].last_compile_start = 0;
 		sim->coders[i].compile_count = 0;
 		sim->coders[i].burned_out = 0;
@@ -89,4 +90,36 @@ int	cleanup_dongles(t_simulation *sim, int count)
 	free(sim->dongles);
 	sim->dongles = NULL;
 	return (1);
+}
+
+int	thread_creation(t_simulation *sim)
+{
+	int	i;
+	int	j;
+	int	error;
+
+	i = 0;
+	error = 0;
+	sim->start_time = current_time();
+	while (i < sim->args.number_of_coders)
+	{
+		if (pthread_create(&sim->coders[i].t, NULL, routine_fun, &sim->coders[i]))
+		{
+			error = 1;
+			break;
+		}
+		i++;
+	}
+	j = i;
+	i = 0;
+	pthread_create(&sim->monitor, NULL, monitor_thread, sim);
+	while (i < j)
+	{
+		if (pthread_join(sim->coders[i].t, NULL))
+			error = 1;
+		i++;
+	}
+	pthread_join(sim->monitor, NULL);
+	return (error);
+
 }

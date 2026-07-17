@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include <sys/time.h>
 
 typedef struct s_coder t_coder;
 typedef struct s_dongle t_dongle;
@@ -23,13 +24,12 @@ typedef struct
 
 typedef struct
 {
+	int	id;
 	pthread_mutex_t lock;
 	pthread_cond_t cond;
     int is_available;
     long waiting_count;
     long    last_released_time;
-    
-    
 } t_dongle;
 
 typedef struct
@@ -52,6 +52,7 @@ typedef struct
 	pthread_mutex_t p_lock;
 	pthread_t monitor;
     int simulation_finished;
+	long	start_time;
 } t_simulation;
 
 int	args_to_struct(int ac, char **av, t_args *ptr);

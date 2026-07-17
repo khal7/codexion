@@ -18,6 +18,7 @@ int	dongle_init(t_args *arg, t_simulation *sim)
 			pthread_mutex_destroy(&sim->dongles[i].lock);
 			return (cleanup_dongles(sim, i));
 		}
+		sim->dongles[i].id = i;
 		sim->dongles[i].is_available = 1;
 		sim->dongles[i].waiting_count = 0;
 		sim->dongles[i].last_released_time = 0;
@@ -47,4 +48,18 @@ void	release_dongle(t_dongle *dongle)
 	dongle->is_available = 1;
 	pthread_cond_signal(&dongle->cond);
 	pthread_mutex_unlock(&dongle->lock);
+}
+
+
+void	connect_dongles(t_simulation *sim)
+{
+	int	i;
+
+	i = 0;
+	while (i < sim->args.number_of_coders)
+	{
+		sim->coders[i].left_dongle = &sim->dongles[i];
+		sim->coders[i].right_dongle = &sim->dongles[(i + 1) % sim->args.number_of_coders];
+		i++;
+	}
 }
