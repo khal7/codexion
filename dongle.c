@@ -1,4 +1,4 @@
-
+#include "codex.h"
 
 int	dongle_init(t_args *arg, t_simulation *sim)
 {
@@ -26,8 +26,6 @@ int	dongle_init(t_args *arg, t_simulation *sim)
 	}
 	return (0);
 }
-
-
 
 void	request_dongle(t_coder *coder, t_dongle *dongle)
 {
@@ -62,4 +60,19 @@ void	connect_dongles(t_simulation *sim)
 		sim->coders[i].right_dongle = &sim->dongles[(i + 1) % sim->args.number_of_coders];
 		i++;
 	}
+}
+
+int	sleep_control(t_simulation *sim, int sleep_time)
+{
+	long	start;
+
+	start = current_time();
+	while (current_time() - start < sleep_time)
+	{
+		if (sim->simulation_finished)
+			return (1);
+		usleep(1000);
+	}
+	return (0);
+
 }

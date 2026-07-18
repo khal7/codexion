@@ -57,7 +57,7 @@ int coder_init(t_args *arg, t_simulation *sim)
 	
 	sim->args = *arg;
 	sim->start_time = 0;
-	sim->similation_finished = 0
+	sim->simulation_finished = 0;
 	sim->coders = NULL;
 	sim->coders = malloc(sizeof(t_coder) * arg->number_of_coders);
 	if (!sim->coders)
@@ -102,8 +102,11 @@ int	thread_creation(t_simulation *sim)
 	error = 0;
 	sim->start_time = current_time();
 	while (i < sim->args.number_of_coders)
+		sim->coders[i++].last_compile_start = sim->start_time;
+	i = 0;
+	while (i < sim->args.number_of_coders)
 	{
-		if (pthread_create(&sim->coders[i].t, NULL, routine_fun, &sim->coders[i]))
+		if (pthread_create(&sim->coders[i].t, NULL, routine, &sim->coders[i]))
 		{
 			error = 1;
 			break;

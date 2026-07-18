@@ -10,7 +10,7 @@ typedef struct s_coder t_coder;
 typedef struct s_dongle t_dongle;
 typedef struct s_simulation t_simulation;
 
-typedef struct
+typedef struct s_coder
 {
     int id;
     pthread_t t;
@@ -22,7 +22,7 @@ typedef struct
     t_simulation *sim;
 } t_coder;
 
-typedef struct
+typedef struct s_dongle
 {
 	int	id;
 	pthread_mutex_t lock;
@@ -32,7 +32,7 @@ typedef struct
     long    last_released_time;
 } t_dongle;
 
-typedef struct
+typedef struct s_args
 {
 	long	number_of_coders;
 	long    time_to_burnout;
@@ -44,7 +44,7 @@ typedef struct
 	char     *scheduler;
 } t_args;
 
-typedef struct
+typedef struct s_simulation
 {
     t_args args;
     t_coder *coders;
@@ -57,6 +57,18 @@ typedef struct
 
 int	args_to_struct(int ac, char **av, t_args *ptr);
 long	ft_atoi(char *str);
-int coder_initializtion(t_args *arg, t_simulation *sim);
-int	dongle_initialization(t_args *arg, t_simulation *sim);
+int coder_init(t_args *arg, t_simulation *sim);
+int	dongle_init(t_args *arg, t_simulation *sim);
 int	cleanup_dongles(t_simulation *sim, int count);
+int	thread_creation(t_simulation *sim);
+int	dongle_init(t_args *arg, t_simulation *sim);
+void	request_dongle(t_coder *coder, t_dongle *dongle);
+void	release_dongle(t_dongle *dongle);
+void	connect_dongles(t_simulation *sim);
+void	*monitor_thread(void *arg);
+long	current_time(void);
+void	printing(t_coder *coder, char *str);
+int	compile_cycle(t_coder *coder, t_dongle *first_dongle, t_dongle *second_dongle);
+void	*routine(void *arg);
+int	sleep_control(t_simulation *sim, int sleep_time);
+
