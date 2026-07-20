@@ -101,7 +101,7 @@ void	*routine(void *arg)
 		{
 			burnout_check = compile_cycle(coder, coder->right_dongle, coder->left_dongle);
 			if (burnout_check)
-			return (NULL);
+				return (NULL);
 		}
 	}
 	return (NULL);
