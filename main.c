@@ -18,6 +18,7 @@ int main(int ac, char **av)
 	if (dongle_init(&arg, &sim) || coder_init(&arg, &sim))
     	return (1);
 	thread_creation(&sim);
+	return (0);
 }
 
 //     printf("this: %ld\n", var.number_of_coders);

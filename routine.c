@@ -16,11 +16,13 @@ void	*monitor_thread(void *arg)
 		{
 			sim->simulation_finished = 1;
 			printing(&sim->coders[i], "burned out");
+			// exit(1);
 			break;
 		}
 		j = 0;
 		while (j < sim->args.number_of_coders)
 		{
+
 			if (sim->coders[j].compile_count < sim->args.number_of_compiles_required)
 			{
 				sim->simulation_finished = 0;
@@ -50,6 +52,7 @@ void	printing(t_coder *coder, char *str)
 {
 	pthread_mutex_lock(&coder->sim->p_lock);
 	printf("%ld %d %s\n", current_time() - coder->sim->start_time, coder->id, str);
+	
 	pthread_mutex_unlock(&coder->sim->p_lock);
 }
 
@@ -58,17 +61,22 @@ int	compile_cycle(t_coder *coder, t_dongle *first_dongle, t_dongle *second_dongl
 	int check;
 
 	check = 0;
+	// printf("Coder %d requesting first dongle\n", coder->id);
 	request_dongle(coder, first_dongle);
 	printing(coder, "has taken a dongle");
 	request_dongle(coder, second_dongle);
 	printing(coder, "has taken a dongle");
+	// printf("Coder %d compiling with dongles %d and %d\n",
+	// 	coder->id,
+	// 	first_dongle->id,
+	// 	second_dongle->id);
 	coder->last_compile_start = current_time();
 	printing(coder, "is compiling");
 	check = sleep_control(coder->sim, coder->sim->args.time_to_compile);
 	if (check)
-		return (release_dongle(first_dongle), release_dongle(second_dongle), 1);
-	release_dongle(first_dongle);
-	release_dongle(second_dongle);
+		return (release_dongle(first_dongle, coder), release_dongle(second_dongle, coder), 1);
+	release_dongle(first_dongle, coder);
+	release_dongle(second_dongle, coder);
 	coder->compile_count++;
 	printing(coder, "is debugging");
 	check = sleep_control(coder->sim, coder->sim->args.time_to_debug );
@@ -88,6 +96,7 @@ void	*routine(void *arg)
 
 	burnout_check = 0;
 	coder = (t_coder *)arg;
+	// printf("Coder %d started\n", coder->id);
 	while (coder->compile_count < coder->sim->args.number_of_compiles_required && !coder->sim->simulation_finished)
 	{
 

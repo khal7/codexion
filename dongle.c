@@ -22,6 +22,13 @@ int	dongle_init(t_args *arg, t_simulation *sim)
 		sim->dongles[i].is_available = 1;
 		sim->dongles[i].waiting_count = 0;
 		sim->dongles[i].last_released_time = 0;
+		sim->dongles[i].waiting_queue.current_n = 0;
+		sim->dongles[i].waiting_queue.max_capacity = 2;
+		sim->dongles[i].waiting_queue.arr = malloc(sizeof(t_coder *) * 2);
+		sim->dongles[i].next_coder = NULL;
+
+		if (!sim->dongles[i].waiting_queue.arr)
+			return (1);
 		i++;
 	}
 	return (0);
@@ -30,21 +37,51 @@ int	dongle_init(t_args *arg, t_simulation *sim)
 void	request_dongle(t_coder *coder, t_dongle *dongle)
 {
 	pthread_mutex_lock(&dongle->lock);
-
-	while (!dongle->is_available)
+	// still need the controle over which thread is getting dongle
+	
+	while (!dongle->is_available || (dongle->next_coder && dongle->next_coder != coder))
+	{
+		if (!coder->waiting_for_dongle)
+		{
+			pthread_mutex_lock(&coder->sim->arrival_lock);
+			coder->arrival_order = coder->sim->arrival_counter++;
+			pthread_mutex_unlock(&coder->sim->arrival_lock);
+			heap_push(&dongle->waiting_queue, coder);
+			coder->waiting_for_dongle = 1;
+		}
 		pthread_cond_wait(&dongle->cond, &dongle->lock);
-
+		// printf(" ++ from request_dongle: Coder: %d takes dongle: %d\n", coder->id, dongle->id);
+	}
 	dongle->is_available = 0;
+	dongle->next_coder = NULL;
+	
 	pthread_mutex_unlock(&dongle->lock);
 }
 
 
-void	release_dongle(t_dongle *dongle)
+void	release_dongle(t_dongle *dongle, t_coder *coder)
 {
 	pthread_mutex_lock(&dongle->lock);
 
-	dongle->is_available = 1;
-	pthread_cond_signal(&dongle->cond);
+	if (!dongle->waiting_queue.current_n)
+	{
+		dongle->next_coder = NULL;
+		dongle->is_available = 1;
+	}
+	else
+	{
+		dongle->next_coder = heap_pop(&dongle->waiting_queue);
+		dongle->next_coder->waiting_for_dongle = 0;
+		dongle->is_available = 1;
+	}
+	// printf(" -- from release_dongle: Coder: %d release dongle: %d\n", coder->id, dongle->id);
+	// if (dongle->next_coder)
+	// 	printf("Dongle %d: next coder %d\n",
+	// 		dongle->id,
+	// 		dongle->next_coder->id);
+	// else
+	// 	printf("Dongle %d: queue empty\n", dongle->id);
+	pthread_cond_broadcast(&dongle->cond);
 	pthread_mutex_unlock(&dongle->lock);
 }
 
@@ -76,3 +113,4 @@ int	sleep_control(t_simulation *sim, int sleep_time)
 	return (0);
 
 }
+
