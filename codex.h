@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <sys/time.h>
-
+#include <time.h>
 typedef struct s_coder t_coder;
 typedef struct s_dongle t_dongle;
 typedef struct s_simulation t_simulation;
@@ -28,7 +28,7 @@ typedef struct s_coder
     int	compile_count;
     int	burned_out;
 	int	waiting_for_dongle;
-	int	arrival_order;
+	long	priority;
     t_simulation *sim;
 } t_coder;
 
@@ -63,6 +63,7 @@ typedef struct s_simulation
     t_dongle *dongles;
 	pthread_mutex_t p_lock;
 	pthread_mutex_t arrival_lock;
+	pthread_mutex_t state_lock;
 	pthread_t monitor;
     int simulation_finished;
 	long	start_time;
@@ -76,7 +77,7 @@ int	dongle_init(t_args *arg, t_simulation *sim);
 int	cleanup_dongles(t_simulation *sim, int count);
 int	thread_creation(t_simulation *sim);
 int	dongle_init(t_args *arg, t_simulation *sim);
-void	request_dongle(t_coder *coder, t_dongle *dongle);
+int	request_dongle(t_coder *coder, t_dongle *dongle);
 void	release_dongle(t_dongle *dongle, t_coder *coder);
 void	connect_dongles(t_simulation *sim);
 void	*monitor_thread(void *arg);

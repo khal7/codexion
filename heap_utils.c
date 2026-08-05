@@ -30,7 +30,10 @@ void	heapify_up(t_heap *heap, int index)
 
 	while (index)
 	{
-		if (heap->arr[index]->arrival_order < heap->arr[(index - 1 ) / 2]->arrival_order)
+		//if (heap->arr[index]->priority < heap->arr[(index - 1 ) / 2]->priority)
+		if (heap->arr[index]->priority < heap->arr[(index - 1) / 2]->priority
+			|| (heap->arr[index]->priority == heap->arr[(index - 1) / 2]->priority
+			&& heap->arr[index]->id < heap->arr[(index - 1) / 2]->id))
 		{
 			ft_swap(&heap->arr[index], &heap->arr[(index - 1 ) / 2]);
 			index = (index - 1) / 2;
@@ -46,6 +49,7 @@ void	heap_push(t_heap *heap, t_coder *coder)
 		return ;
 	heap->arr[heap->current_n] = coder;
 	heap->current_n++;
+	//printf(" >>> %d\n", coder->id);
 	//printf("PUSH coder %d arrival=%d\n", coder->id, coder->arrival_order);
 	// printf("PUSH %d (size before=%d)\n",
     //    coder->id,
@@ -54,10 +58,33 @@ void	heap_push(t_heap *heap, t_coder *coder)
 	heapify_up(heap, heap->current_n - 1);	
 }
 
+// void heapify_down(t_heap *heap, int index)
+// {
+// 	int	left;
+// 	int right;
+// 	int	small;
+
+// 	while (1)
+// 	{
+// 		left = 2 * index + 1;
+// 		right = 2 * index + 2;
+// 		if (left >= heap->current_n)
+// 			break ;
+// 		small = left;
+
+// 		if (right < heap->current_n && heap->arr[right]->priority < heap->arr[left]->priority)
+// 			small = right;
+// 		if (heap->arr[index]->priority <= heap->arr[small]->priority)
+// 			break ;
+// 		ft_swap(&heap->arr[index], &heap->arr[small]);
+// 		index = small;
+// 	}
+// }
+
 void heapify_down(t_heap *heap, int index)
 {
 	int	left;
-	int right;
+	int	right;
 	int	small;
 
 	while (1)
@@ -65,17 +92,22 @@ void heapify_down(t_heap *heap, int index)
 		left = 2 * index + 1;
 		right = 2 * index + 2;
 		if (left >= heap->current_n)
-			break ;
+			break;
 		small = left;
-
-		if (right < heap->current_n && heap->arr[right]->arrival_order < heap->arr[left]->arrival_order)
+		if (right < heap->current_n
+			&& (heap->arr[right]->priority < heap->arr[left]->priority
+				|| (heap->arr[right]->priority == heap->arr[left]->priority
+					&& heap->arr[right]->id < heap->arr[left]->id)))
 			small = right;
-		if (heap->arr[index]->arrival_order <= heap->arr[small]->arrival_order)
-			break ;
+		if (heap->arr[index]->priority < heap->arr[small]->priority
+			|| (heap->arr[index]->priority == heap->arr[small]->priority
+				&& heap->arr[index]->id <= heap->arr[small]->id))
+			break;
 		ft_swap(&heap->arr[index], &heap->arr[small]);
 		index = small;
 	}
 }
+
 
 t_coder	*heap_pop(t_heap *heap)
 {

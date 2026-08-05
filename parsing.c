@@ -62,6 +62,7 @@ int coder_init(t_args *arg, t_simulation *sim)
 	sim->arrival_counter = 0;
 	pthread_mutex_init(&sim->arrival_lock, NULL);
 	pthread_mutex_init(&sim->p_lock, NULL);
+	pthread_mutex_init(&sim->state_lock, NULL);
 	sim->coders = malloc(sizeof(t_coder) * arg->number_of_coders);
 	if (!sim->coders)
 		return (cleanup_dongles(sim, sim->args.number_of_coders), 1);
@@ -74,7 +75,7 @@ int coder_init(t_args *arg, t_simulation *sim)
 		sim->coders[i].burned_out = 0;
 		sim->coders[i].sim = sim;
 		sim->coders[i].waiting_for_dongle = 0;
-		sim->coders[i].arrival_order = 0;
+		sim->coders[i].priority = 0;
 
 		i++;
 	}
@@ -130,5 +131,4 @@ int	thread_creation(t_simulation *sim)
 	}
 	pthread_join(sim->monitor, NULL);
 	return (error);
-
 }
