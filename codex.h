@@ -64,6 +64,7 @@ typedef struct s_simulation
 	pthread_mutex_t p_lock;
 	pthread_mutex_t arrival_lock;
 	pthread_mutex_t state_lock;
+	pthread_cond_t dongle_cond;
 	pthread_t monitor;
     int simulation_finished;
 	long	start_time;
@@ -77,7 +78,7 @@ int	dongle_init(t_args *arg, t_simulation *sim);
 int	cleanup_dongles(t_simulation *sim, int count);
 int	thread_creation(t_simulation *sim);
 int	dongle_init(t_args *arg, t_simulation *sim);
-int	request_dongle(t_coder *coder, t_dongle *dongle);
+int	request_dongle(t_coder *coder, t_dongle *first_dongle, t_dongle *second_dongle);
 void	release_dongle(t_dongle *dongle, t_coder *coder);
 void	connect_dongles(t_simulation *sim);
 void	*monitor_thread(void *arg);

@@ -15,44 +15,7 @@ void	sim_set_finished(t_simulation *sim, int value)
 	sim->simulation_finished = value;
 	pthread_mutex_unlock(&sim->state_lock);
 }
-// void	*monitor_thread(void *arg)
-// {
-// 	int	i;
-// 	int j;
-// 	t_simulation *sim;
 
-// 	i = 0;
-// 	sim = (t_simulation *)arg;
-// 	while (!sim->simulation_finished)
-// 	{
-// 		sim->simulation_finished = 1;
-// 		if (current_time() - sim->coders[i].last_compile_start >= sim->args.time_to_burnout)
-// 		{
-// 			sim->simulation_finished = 1;
-// 			printing(&sim->coders[i], "burned out");
-// 			// exit(1);
-// 			break;
-// 		}
-// 		j = 0;
-// 		while (j < sim->args.number_of_coders)
-// 		{
-
-// 			if (sim->coders[j].compile_count < sim->args.number_of_compiles_required)
-// 			{
-// 				sim->simulation_finished = 0;
-// 				break;
-// 			}	
-// 			j++;
-// 		}
-// 		i++;
-// 		if (sim->simulation_finished)
-// 			break;
-// 		if (i >= sim->args.number_of_coders)
-// 			i = 0;
-// 		usleep(2000);
-// 	}
-// 	return (NULL);
-// }
 void	*monitor_thread(void *arg)
 {
 	int		i;
@@ -124,30 +87,13 @@ void	printing(t_coder *coder, char *str)
 int	compile_cycle(t_coder *coder, t_dongle *first_dongle, t_dongle *second_dongle)
 {
 	int check;
-	char buf[64];
 
 	check = 0;
-	if (!request_dongle(coder, first_dongle))
+	if (!request_dongle(coder, first_dongle, second_dongle))
 		return (1);   // simulation ended while waiting — give up, don't print anything false
-	sprintf(buf, "has taken dongle %d", first_dongle->id);
-	printing(coder, buf);
+	printing(coder, "has taken a dongle");
+	printing(coder, "has taken a dongle");
 
-	if (!request_dongle(coder, second_dongle))
-	{
-		release_dongle(first_dongle, coder);   // give back the first one you already got
-		return (1);
-	}
-	sprintf(buf, "has taken dongle %d", second_dongle->id);
-	printing(coder, buf);
-	// // printf("Coder %d requesting first dongle\n", coder->id);
-	// request_dongle(coder, first_dongle);
-	// printing(coder, "has taken a dongle");
-	// request_dongle(coder, second_dongle);
-	// printing(coder, "has taken a dongle");
-	// printf("Coder %d compiling with dongles %d and %d\n",
-	// 	coder->id,
-	// 	first_dongle->id,
-	// 	second_dongle->id);
 	pthread_mutex_lock(&coder->sim->state_lock);
 	coder->last_compile_start = current_time();
 	pthread_mutex_unlock(&coder->sim->state_lock);
