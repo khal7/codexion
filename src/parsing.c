@@ -66,6 +66,11 @@ int coder_init(t_args *arg, t_simulation *sim)
 	sim->coders = malloc(sizeof(t_coder) * arg->number_of_coders);
 	if (!sim->coders)
 		return (cleanup_dongles(sim, sim->args.number_of_coders), 1);
+	sim->global_queue.current_n = 0;
+	sim->global_queue.max_capacity = arg->number_of_coders;
+	sim->global_queue.arr = malloc(sizeof(t_coder *) * arg->number_of_coders);
+	if (!sim->global_queue.arr)
+		return (1);
 	i = 0;
 	while (i < arg->number_of_coders)
 	{
@@ -90,8 +95,8 @@ int	cleanup_dongles(t_simulation *sim, int count)
 	i = 0;
 	while (i < count)
 	{
-		pthread_cond_destroy(&sim->dongles[i].cond);
-		pthread_mutex_destroy(&sim->dongles[i].lock);
+		// pthread_cond_destroy(&sim->dongles[i].cond);
+		// pthread_mutex_destroy(&sim->dongles[i].lock);
 		i++;
 	}
 	free(sim->dongles);

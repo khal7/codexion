@@ -126,6 +126,8 @@ void	*routine(void *arg)
 	burnout_check = 0;
 	coder = (t_coder *)arg;
 	// printf("Coder %d started\n", coder->id);
+	if (coder->id % 2 == 0)
+		usleep(1000);
 	while (coder->compile_count < coder->sim->args.number_of_compiles_required && !sim_is_finished(coder->sim))
 	{
 

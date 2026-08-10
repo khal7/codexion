@@ -36,11 +36,11 @@ typedef struct s_dongle
 {
 	int	id;
 	pthread_mutex_t lock;
-	pthread_cond_t cond;
+	//pthread_cond_t cond;
     int is_available;
     long waiting_count;
     long    last_released_time;
-	t_heap	waiting_queue;
+	//t_heap	waiting_queue;
 	t_coder *next_coder;
 } t_dongle;
 
@@ -61,10 +61,12 @@ typedef struct s_simulation
     t_args args;
     t_coder *coders;
     t_dongle *dongles;
+	t_heap	global_queue;
+	pthread_mutex_t queue_lock;
 	pthread_mutex_t p_lock;
 	pthread_mutex_t arrival_lock;
 	pthread_mutex_t state_lock;
-	pthread_cond_t dongle_cond;
+	// pthread_cond_t dongle_cond;
 	pthread_t monitor;
     int simulation_finished;
 	long	start_time;
@@ -92,3 +94,12 @@ void	heapify_up(t_heap *heap, int index);
 void	heap_push(t_heap *heap, t_coder *coder);
 void	heapify_down(t_heap *heap, int index);
 t_coder	*heap_pop(t_heap *heap);
+// test functions 
+int		is_higher_priority(t_coder *a, t_coder *b);
+int		shares_dongle(t_coder *a, t_dongle *low, t_dongle *high);
+int		allowed_to_take(t_simulation *sim, t_coder *coder, t_dongle *low, t_dongle *high);
+void	register_coder(t_coder *coder, t_simulation *sim);
+int		try_take_dongles(t_coder *coder, t_dongle *low, t_dongle *high);
+int		heap_find(t_heap *heap, t_coder *coder);
+void	heap_remove_at(t_heap *heap, int index);
+int		request_dongle(t_coder *coder, t_dongle *first_dongle, t_dongle *second_dongle);

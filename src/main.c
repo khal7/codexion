@@ -1,4 +1,22 @@
 #include "codex.h"
+void	clean_simu(t_simulation *sim)
+{
+	int	i;
+
+	i = 0;
+	while (i < sim->args.number_of_coders)
+	{
+		pthread_mutex_destroy(&sim->dongles[i].lock);
+		i++;
+	}
+	pthread_mutex_destroy(&sim->queue_lock);
+	pthread_mutex_destroy(&sim->p_lock);
+	pthread_mutex_destroy(&sim->arrival_lock);
+	pthread_mutex_destroy(&sim->state_lock);
+	free(sim->global_queue.arr);
+	free(sim->dongles);
+	free(sim->coders);
+}
 
 int main(int ac, char **av)
 {
@@ -18,5 +36,6 @@ int main(int ac, char **av)
 	if (dongle_init(&arg, &sim) || coder_init(&arg, &sim))
     	return (1);
 	thread_creation(&sim);
+	clean_simu(&sim);
 	return (0);
 }
