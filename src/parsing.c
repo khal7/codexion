@@ -1,6 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: khabouou <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/10 16:56:06 by khabouou          #+#    #+#             */
+/*   Updated: 2026/08/10 16:56:10 by khabouou         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "codex.h"
-
 
 long	ft_atoi(char *str)
 {
@@ -8,7 +18,6 @@ long	ft_atoi(char *str)
 	int		digit;
 
 	result = 0;
-
 	if (*str == '+')
 		str++;
 	if (*str == '\0')
@@ -27,10 +36,11 @@ long	ft_atoi(char *str)
 	return (result);
 }
 
-int  args_to_struct(int ac, char **av, t_args *ptr)
+int	args_to_struct(int ac, char **av, t_args *ptr)
 {
-	int i;
-	int j;	
+	int	i;
+	int	j;
+
 	i = 1;
 	while (av[i] && i < (ac - 1))
 	{
@@ -38,7 +48,7 @@ int  args_to_struct(int ac, char **av, t_args *ptr)
 			return (-1);
 		i++;
 	}
-	if (strcmp(av[8], "fifo") && strcmp(av[8], "edf")) 
+	if (strcmp(av[8], "fifo") && strcmp(av[8], "edf"))
 		return (-1);
 	ptr->number_of_coders = ft_atoi(av[1]);
 	ptr->time_to_burnout = ft_atoi(av[2]);
@@ -51,18 +61,12 @@ int  args_to_struct(int ac, char **av, t_args *ptr)
 	return (0);
 }
 
-int coder_init(t_args *arg, t_simulation *sim)
+int	coder_init(t_args *arg, t_simulation *sim)
 {
 	int	i;
-	
+
 	sim->args = *arg;
-	sim->start_time = 0;
-	sim->simulation_finished = 0;
 	sim->coders = NULL;
-	sim->arrival_counter = 0;
-	pthread_mutex_init(&sim->arrival_lock, NULL);
-	pthread_mutex_init(&sim->p_lock, NULL);
-	pthread_mutex_init(&sim->state_lock, NULL);
 	sim->coders = malloc(sizeof(t_coder) * arg->number_of_coders);
 	if (!sim->coders)
 		return (cleanup_dongles(sim, sim->args.number_of_coders), 1);
@@ -81,11 +85,9 @@ int coder_init(t_args *arg, t_simulation *sim)
 		sim->coders[i].sim = sim;
 		sim->coders[i].waiting_for_dongle = 0;
 		sim->coders[i].priority = 0;
-
 		i++;
 	}
-	connect_dongles(sim);
-	return (0);
+	return (connect_dongles(sim), 0);
 }
 
 int	cleanup_dongles(t_simulation *sim, int count)
@@ -93,12 +95,6 @@ int	cleanup_dongles(t_simulation *sim, int count)
 	int	i;
 
 	i = 0;
-	while (i < count)
-	{
-		// pthread_cond_destroy(&sim->dongles[i].cond);
-		// pthread_mutex_destroy(&sim->dongles[i].lock);
-		i++;
-	}
 	free(sim->dongles);
 	sim->dongles = NULL;
 	return (1);
@@ -106,10 +102,7 @@ int	cleanup_dongles(t_simulation *sim, int count)
 
 int	thread_creation(t_simulation *sim)
 {
-	int	i;
-	int	j;
-	int	error;
-
+	int (i), (j), (error);
 	i = 0;
 	error = 0;
 	sim->start_time = current_time();
@@ -121,7 +114,7 @@ int	thread_creation(t_simulation *sim)
 		if (pthread_create(&sim->coders[i].t, NULL, routine, &sim->coders[i]))
 		{
 			error = 1;
-			break;
+			break ;
 		}
 		i++;
 	}
@@ -129,11 +122,7 @@ int	thread_creation(t_simulation *sim)
 	i = 0;
 	pthread_create(&sim->monitor, NULL, monitor_thread, sim);
 	while (i < j)
-	{
-		if (pthread_join(sim->coders[i].t, NULL))
+		if (pthread_join(sim->coders[i++].t, NULL))
 			error = 1;
-		i++;
-	}
-	pthread_join(sim->monitor, NULL);
-	return (error);
+	return (pthread_join(sim->monitor, NULL), error);
 }

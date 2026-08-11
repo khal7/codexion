@@ -9,6 +9,8 @@ SRCS = src/dongle.c\
 		src/parsing.c\
 		src/request_dongle.c\
 		src/routine.c\
+		src/request_dongle_utils.c\
+		src/utils.c
 
 OBJS = $(SRCS:.c=.o)
 
