@@ -12,6 +12,18 @@
 
 #include "codex.h"
 
+void	printing_three_lines(t_coder *coder)
+{
+	pthread_mutex_lock(&coder->sim->p_lock);
+	printf("%ld %d %s\n", current_time()
+		- coder->sim->start_time, coder->id, "has taken a dongle");
+	printf("%ld %d %s\n", current_time()
+		- coder->sim->start_time, coder->id, "has taken a dongle");
+	printf("%ld %d %s\n", current_time()
+		- coder->sim->start_time, coder->id, "is compiling");
+	pthread_mutex_unlock(&coder->sim->p_lock);
+}
+
 void	clean_simu(t_simulation *sim)
 {
 	int	i;

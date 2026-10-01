@@ -55,14 +55,13 @@ void	printing(t_coder *coder, char *str)
 int	compile_cycle(t_coder *coder, t_dongle *first_dongle
 	, t_dongle *second_dongle)
 {
-	if (!request_dongle(coder, first_dongle, second_dongle))
+	if (!request_dongle(coder, first_dongle, second_dongle)
+		|| sim_is_finished(coder->sim))
 		return (1);
-	printing(coder, "has taken a dongle");
-	printing(coder, "has taken a dongle");
+	printing_three_lines(coder);
 	pthread_mutex_lock(&coder->sim->state_lock);
 	coder->last_compile_start = current_time();
 	pthread_mutex_unlock(&coder->sim->state_lock);
-	printing(coder, "is compiling");
 	if (sleep_control(coder->sim, coder->sim->args.time_to_compile))
 		return (release_dongle(first_dongle, coder),
 			release_dongle(second_dongle, coder), 1);
@@ -71,8 +70,11 @@ int	compile_cycle(t_coder *coder, t_dongle *first_dongle
 	pthread_mutex_lock(&coder->sim->state_lock);
 	coder->compile_count++;
 	pthread_mutex_unlock(&coder->sim->state_lock);
+	if (sim_is_finished(coder->sim))
+		return (1);
 	printing(coder, "is debugging");
-	if (sleep_control(coder->sim, coder->sim->args.time_to_debug))
+	if (sleep_control(coder->sim, coder->sim->args.time_to_debug)
+		|| sim_is_finished(coder->sim))
 		return (1);
 	printing(coder, "is refactoring");
 	if (sleep_control(coder->sim, coder->sim->args.time_to_refactor))

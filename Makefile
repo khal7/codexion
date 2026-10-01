@@ -2,7 +2,8 @@
 NAME = codexion
 
 CC = gcc
-CFLAGS = -pthread 
+CFLAGS = -pthread
+FFLAG = -fsanitize=thread
 SRCS = src/dongle.c\
 		src/heap_utils.c\
 		src/main.c\

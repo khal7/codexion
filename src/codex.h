@@ -120,3 +120,4 @@ void	sim_set_finished(t_simulation *sim, int value);
 
 int		all_compile_done(t_simulation *sim);
 int		burnout_check(t_simulation *sim, int i);
+void	printing_three_lines(t_coder *coder);
