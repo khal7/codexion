@@ -35,7 +35,6 @@ int	dongle_init(t_args *arg, t_simulation *sim)
 		sim->dongles[i].is_available = 1;
 		sim->dongles[i].waiting_count = 0;
 		sim->dongles[i].last_released_time = 0;
-		sim->dongles[i].next_coder = NULL;
 		i++;
 	}
 	return (0);

@@ -56,11 +56,12 @@ int	main(int ac, char **av)
 	if (args_to_struct(ac, av, &arg) == -1)
 	{
 		printf("Invalid arguments.\n");
-		return (0);
+		return (1);
 	}
 	if (dongle_init(&arg, &sim) || coder_init(&arg, &sim))
 		return (1);
-	thread_creation(&sim);
+	if (thread_creation(&sim))
+		return (clean_simu(&sim), 1);
 	clean_simu(&sim);
 	return (0);
 }

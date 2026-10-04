@@ -69,7 +69,6 @@ int	try_take_dongles(t_coder *coder, t_dongle *low, t_dongle *high)
 	long	cooldown;
 	int		ok;
 
-	(void)coder;
 	cooldown = coder->sim->args.dongle_cooldown;
 	pthread_mutex_lock(&low->lock);
 	pthread_mutex_lock(&high->lock);

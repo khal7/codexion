@@ -51,7 +51,7 @@ typedef struct s_dongle
 	int				is_available;
 	long			waiting_count;
 	long			last_released_time;
-	t_coder			*next_coder;
+	// t_coder			*next_coder;
 }	t_dongle;
 
 typedef struct s_args
