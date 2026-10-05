@@ -105,7 +105,6 @@ void	heap_push(t_heap *heap, t_coder *coder);
 void	heapify_down(t_heap *heap, int index);
 t_coder	*heap_pop(t_heap *heap);
 
-/* Test functions */
 int		is_higher_priority(t_coder *a, t_coder *b);
 int		shares_dongle(t_coder *a, t_dongle *low, t_dongle *high);
 int		allowed_to_take(t_simulation *sim, t_coder *coder,
