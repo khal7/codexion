@@ -2,8 +2,7 @@
 NAME = codexion
 
 CC = gcc
-CFLAGS = -pthread
-FFLAG = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -pthread
 SRCS = src/dongle.c\
 		src/heap_utils.c\
 		src/main.c\
