@@ -16,6 +16,8 @@ int	is_higher_priority(t_coder *a, t_coder *b)
 {
 	if (a->priority != b->priority)
 		return (a->priority < b->priority);
+	if (a->queue_arrival_time != b->queue_arrival_time)
+		return (a->queue_arrival_time < b->queue_arrival_time);
 	return (a->id < b->id);
 }
 
@@ -58,6 +60,7 @@ void	register_coder(t_coder *coder, t_simulation *sim)
 	}
 	else
 		coder->priority = coder->last_compile_start + sim->args.time_to_burnout;
+	coder->queue_arrival_time = current_time();
 	pthread_mutex_lock(&sim->queue_lock);
 	heap_push(&sim->global_queue, coder);
 	pthread_mutex_unlock(&sim->queue_lock);

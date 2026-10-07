@@ -37,6 +37,7 @@ typedef struct s_coder
 	t_dongle		*right_dongle;
 	t_simulation	*sim;
 	long			last_compile_start;
+	long			queue_arrival_time;
 	int				compile_count;
 	int				id;
 	int				burned_out;
@@ -85,7 +86,7 @@ int		args_to_struct(int ac, char **av, t_args *ptr);
 long	ft_atoi(char *str);
 int		coder_init(t_args *arg, t_simulation *sim);
 int		dongle_init(t_args *arg, t_simulation *sim);
-int		cleanup_dongles(t_simulation *sim, int count);
+int		cleanup_dongles(t_simulation *sim);
 int		thread_creation(t_simulation *sim);
 int		request_dongle(t_coder *coder, t_dongle *first_dongle,
 			t_dongle *second_dongle);

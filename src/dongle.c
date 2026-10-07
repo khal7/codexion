@@ -30,7 +30,7 @@ int	dongle_init(t_args *arg, t_simulation *sim)
 	while (i < arg->number_of_coders)
 	{
 		if (pthread_mutex_init(&sim->dongles[i].lock, NULL))
-			return (cleanup_dongles(sim, i));
+			return (cleanup_dongles(sim));
 		sim->dongles[i].id = i;
 		sim->dongles[i].is_available = 1;
 		sim->dongles[i].waiting_count = 0;
