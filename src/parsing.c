@@ -50,6 +50,8 @@ int	args_to_struct(int ac, char **av, t_args *ptr)
 	if (strcmp(av[8], "fifo") && strcmp(av[8], "edf"))
 		return (-1);
 	ptr->number_of_coders = ft_atoi(av[1]);
+	if (ptr->number_of_coders == 0)
+		return (-1);
 	ptr->time_to_burnout = ft_atoi(av[2]);
 	ptr->time_to_compile = ft_atoi(av[3]);
 	ptr->time_to_debug = ft_atoi(av[4]);
